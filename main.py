@@ -143,6 +143,14 @@ class WebhookHandler(webapp2.RequestHandler):
             logging.info('send response:')
             logging.info(resp)
 
+        def getResult(category):
+            latlangparam = location.getLocation(chat_id)
+            if latlangparam:
+                nearest = location.getNearest(str(category), str(latlangparam))
+                displayList(nearest)
+            else:
+                reply('Please send me your location')
+
         if text.startswith('/'):
             if text == '/start':
                 reply('Now, send me your current location')
@@ -153,19 +161,9 @@ class WebhookHandler(webapp2.RequestHandler):
             elif text == '/help':
                 reply('Hello. I will help you to find places you need.\nTo begin, type /start then send your current location. After that, type any command below to find nearest local places that you need: \n1. /hospital\n2. /school')
             elif text == '/hospital':
-                latlangparam = location.getLocation(chat_id)
-                if latlangparam:
-                    nearest = location.getNearest('287', str(latlangparam))
-                    displayList(nearest)
-                else:
-                    reply('Please send me your location')
+                getResult('287')
             elif text == '/school':
-                latlangparam = location.getLocation(chat_id)
-                if latlangparam:
-                    nearest = location.getNearest('203', str(latlangparam))
-                    displayList(nearest)
-                else:
-                    reply('Please send me your location')
+                getResult('203')
             elif text == '/image':
                 img = Image.new('RGB', (512, 512))
                 base = random.randint(0, 16777216)
