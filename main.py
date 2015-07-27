@@ -14,9 +14,8 @@ from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 import webapp2
 
-TOKEN = 'YOUR_BOT_TOKEN_HERE'
-
-BASE_URL = 'https://api.telegram.org/bot' + TOKEN + '/'
+# token and others
+import defines
 
 
 # ================================
@@ -45,13 +44,13 @@ def getEnabled(chat_id):
 class MeHandler(webapp2.RequestHandler):
     def get(self):
         urlfetch.set_default_fetch_deadline(60)
-        self.response.write(json.dumps(json.load(urllib2.urlopen(BASE_URL + 'getMe'))))
+        self.response.write(json.dumps(json.load(urllib2.urlopen(defines.BASE_URL + 'getMe'))))
 
 
 class GetUpdatesHandler(webapp2.RequestHandler):
     def get(self):
         urlfetch.set_default_fetch_deadline(60)
-        self.response.write(json.dumps(json.load(urllib2.urlopen(BASE_URL + 'getUpdates'))))
+        self.response.write(json.dumps(json.load(urllib2.urlopen(defines.BASE_URL + 'getUpdates'))))
 
 
 class SetWebhookHandler(webapp2.RequestHandler):
@@ -59,7 +58,7 @@ class SetWebhookHandler(webapp2.RequestHandler):
         urlfetch.set_default_fetch_deadline(60)
         url = self.request.get('url')
         if url:
-            self.response.write(json.dumps(json.load(urllib2.urlopen(BASE_URL + 'setWebhook', urllib.urlencode({'url': url})))))
+            self.response.write(json.dumps(json.load(urllib2.urlopen(defines.BASE_URL + 'setWebhook', urllib.urlencode({'url': url})))))
 
 
 class WebhookHandler(webapp2.RequestHandler):
@@ -85,14 +84,14 @@ class WebhookHandler(webapp2.RequestHandler):
 
         def reply(msg=None, img=None):
             if msg:
-                resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
+                resp = urllib2.urlopen(defines.BASE_URL + 'sendMessage', urllib.urlencode({
                     'chat_id': str(chat_id),
                     'text': msg.encode('utf-8'),
                     'disable_web_page_preview': 'true',
                     'reply_to_message_id': str(message_id),
                 })).read()
             elif img:
-                resp = multipart.post_multipart(BASE_URL + 'sendPhoto', [
+                resp = multipart.post_multipart(defines.BASE_URL + 'sendPhoto', [
                     ('chat_id', str(chat_id)),
                     ('reply_to_message_id', str(message_id)),
                 ], [
@@ -126,7 +125,7 @@ class WebhookHandler(webapp2.RequestHandler):
         # CUSTOMIZE FROM HERE
 
         elif 'who are you' in text:
-            reply('telebot starter kit, created by yukuku: https://github.com/yukuku/telebot')
+            reply('LocateMe Bot, created by adityaputra: https://github.com/adityaputra/telegram-locate-me')
         elif 'what time' in text:
             reply('look at the top-right corner of your screen!')
         else:
