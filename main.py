@@ -165,7 +165,7 @@ class WebhookHandler(webapp2.RequestHandler):
                 reply('Bot disabled. Rate us here https://telegram.me/storebot?start=locatemebot')
                 setEnabled(chat_id, False, fr['username'])
             elif text == '/help':
-                reply('Hello. I will help you to find places you need.\nTo begin, type /start then send your current location. After that, type any command below to find nearest local places that you need: \n1. /hospital\n2. /school\nRate us here https://telegram.me/storebot?start=locatemebot')
+                reply('Hello. I will help you to find places you need.\nTo begin, type /start then send your current location. After that, type any command below to find nearest local places that you need: \n1. /hospital\n2. /fuel\n3. /transportation\n4. /restaurant\n5. /shop\n6. /hotel\n7. /religion\n8. /school\n9. /pharmacy\nRate us here https://telegram.me/storebot?start=locatemebot')
             elif text == '/hospital':
                 getResult('287')
             elif text == '/fuel':
