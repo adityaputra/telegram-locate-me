@@ -131,17 +131,20 @@ class WebhookHandler(webapp2.RequestHandler):
                 text += '\tWikimapia: http://wikimapia.org/' + json.dumps(data['id']) + '/\n'
                 text += '\tGoogle Maps: https://maps.google.com/maps?q=' + json.dumps(data['location']['lat']) + ',' + json.dumps(data['location']['lon']) + '&ll=' + json.dumps(data['location']['lat']) + ',' + json.dumps(data['location']['lon']) + '&z=15\n'
 
-                if i == 5:
+                if i == 10:
                     break;
+            if i == 0:
+                reply('No result nearby. Sorry.')
 
-            resp = urllib2.urlopen(defines.BASE_URL + 'sendMessage', urllib.urlencode({
-                'chat_id': str(chat_id),
-                'text': text.encode('utf-8'),
-                'disable_web_page_preview': 'true',
-                'reply_to_message_id': str(message_id),
-            })).read()
-            logging.info('send response:')
-            logging.info(resp)
+            else:
+                resp = urllib2.urlopen(defines.BASE_URL + 'sendMessage', urllib.urlencode({
+                    'chat_id': str(chat_id),
+                    'text': text.encode('utf-8'),
+                    'disable_web_page_preview': 'true',
+                    'reply_to_message_id': str(message_id),
+                })).read()
+                logging.info('send response:')
+                logging.info(resp)
 
         def getResult(category):
             latlangparam = location.getLocation(chat_id)
@@ -162,8 +165,24 @@ class WebhookHandler(webapp2.RequestHandler):
                 reply('Hello. I will help you to find places you need.\nTo begin, type /start then send your current location. After that, type any command below to find nearest local places that you need: \n1. /hospital\n2. /school')
             elif text == '/hospital':
                 getResult('287')
+            elif text == '/fuel':
+                getResult('6644')
+            elif text == '/transportation':
+                getResult('2134')
+            elif text == '/restaurant':
+                getResult('74')
+            elif text == '/shop':
+                getResult('7')
+            elif text == '/hotel':
+                getResult('50')
+            elif text == '/religion':
+                getResult('1663')
             elif text == '/school':
                 getResult('203')
+            elif text == '/leisure':
+                getResult('4')
+            elif text == '/pharmacy':
+                getResult('787')
             elif text == '/image':
                 img = Image.new('RGB', (512, 512))
                 base = random.randint(0, 16777216)
