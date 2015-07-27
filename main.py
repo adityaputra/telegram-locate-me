@@ -17,6 +17,9 @@ import webapp2
 # token and others
 import defines
 
+# location services
+import location
+
 
 # ================================
 
@@ -77,9 +80,21 @@ class WebhookHandler(webapp2.RequestHandler):
         fr = message.get('from')
         chat = message['chat']
         chat_id = chat['id']
+        latlang = message.get('location')
+        if latlang:
+            latitude = latlang['latitude']
+            longitude = latlang['longitude']
 
         if not text:
             logging.info('no text')
+            if latlang:
+                logging.info('latlang: ')
+                logging.info(latlang)
+                logging.info(latitude)
+                logging.info(longitude)
+                location.setLocation(chat_id, latlang, latitude, longitude)
+                logging.info('update location: ')
+
             return
 
         def reply(msg=None, img=None):
