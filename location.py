@@ -1,4 +1,9 @@
+import StringIO
+import json
 import logging
+import urllib
+import urllib2
+from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 
 # ==========================
@@ -18,7 +23,30 @@ def setLocation(chat_id, coordinate, latitude, longitude):
                             latitude = str(latitude),
                             longitude = str(longitude))
 
-    # loc = LocationStatus.get_or_insert(str(chat_id), str(coordinate))
-    # loc.enabled = yes
     setloc = loc.put()
     logging.info(setloc)
+
+# =============================
+def getLocation(chatId):
+
+    ls = LocationStatus.query(LocationStatus.chat_id == str(chatId)).order(-LocationStatus.date)
+    if ls:
+        logging.info('getLocation: ')
+        for l in ls:
+            logging.info(l.latitude)
+            logging.info(l.longitude)
+            latlangparam = '&lat='+str(l.latitude)+'+&lon='+str(l.longitude)
+            logging.info(latlangparam)
+            return (latlangparam)
+    else:
+        logging.info('getLocation: ls empty')
+        return False
+
+# =============================
+def getNearest(category, latlang):
+    getNearestUrl = 'http://api.wikimapia.org/?key=example&function=place.getnearest'+str(latlang)+'&format=json&pack=&language=en&count=50&category='+str(category)
+    urlfetch.set_default_fetch_deadline(60)
+    result = json.load(urllib2.urlopen(getNearestUrl))
+    logging.info(result)
+    logging.info('getNearest done')
+    return result

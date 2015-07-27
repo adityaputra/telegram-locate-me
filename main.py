@@ -85,17 +85,6 @@ class WebhookHandler(webapp2.RequestHandler):
             latitude = latlang['latitude']
             longitude = latlang['longitude']
 
-        if not text:
-            logging.info('no text')
-            if latlang:
-                logging.info('latlang: ')
-                logging.info(latlang)
-                logging.info(latitude)
-                logging.info(longitude)
-                location.setLocation(chat_id, latlang, latitude, longitude)
-                logging.info('update location: ')
-
-            return
 
         def reply(msg=None, img=None):
             if msg:
@@ -119,13 +108,64 @@ class WebhookHandler(webapp2.RequestHandler):
             logging.info('send response:')
             logging.info(resp)
 
+        if not text:
+            logging.info('no text')
+            if latlang:
+                logging.info('latlang: ')
+                logging.info(latlang)
+                logging.info(latitude)
+                logging.info(longitude)
+                location.setLocation(chat_id, latlang, latitude, longitude)
+                logging.info('update location: ')
+                reply('Alright, what do you need?\n1. /hospital\n2. /school')
+
+            return
+
+
+        def displayList(resultSet):
+            text = ''
+            i = 0
+            for data in resultSet['places']:
+                i = i+1
+                text += str(i) + '.\t' + json.dumps(data['title']) + '\n'
+                text += '\tWikimapia: http://wikimapia.org/' + json.dumps(data['id']) + '/\n'
+                text += '\tGoogle Maps: https://maps.google.com/maps?q=' + json.dumps(data['location']['lat']) + ',' + json.dumps(data['location']['lon']) + '&ll=' + json.dumps(data['location']['lat']) + ',' + json.dumps(data['location']['lon']) + '&z=15\n'
+
+                if i == 5:
+                    break;
+
+            resp = urllib2.urlopen(defines.BASE_URL + 'sendMessage', urllib.urlencode({
+                'chat_id': str(chat_id),
+                'text': text.encode('utf-8'),
+                'disable_web_page_preview': 'true',
+                'reply_to_message_id': str(message_id),
+            })).read()
+            logging.info('send response:')
+            logging.info(resp)
+
         if text.startswith('/'):
             if text == '/start':
-                reply('Bot enabled')
+                reply('Now, send me your current location')
                 setEnabled(chat_id, True)
             elif text == '/stop':
                 reply('Bot disabled')
                 setEnabled(chat_id, False)
+            elif text == '/help':
+                reply('Hello. I will help you to find places you need.\nTo begin, type /start then send your current location. After that, type any command below to find nearest local places that you need: \n1. /hospital\n2. /school')
+            elif text == '/hospital':
+                latlangparam = location.getLocation(chat_id)
+                if latlangparam:
+                    nearest = location.getNearest('287', str(latlangparam))
+                    displayList(nearest)
+                else:
+                    reply('Please send me your location')
+            elif text == '/school':
+                latlangparam = location.getLocation(chat_id)
+                if latlangparam:
+                    nearest = location.getNearest('203', str(latlangparam))
+                    displayList(nearest)
+                else:
+                    reply('Please send me your location')
             elif text == '/image':
                 img = Image.new('RGB', (512, 512))
                 base = random.randint(0, 16777216)
