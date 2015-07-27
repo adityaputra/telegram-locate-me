@@ -26,13 +26,16 @@ import location
 class EnableStatus(ndb.Model):
     # key name: str(chat_id)
     enabled = ndb.BooleanProperty(indexed=False, default=False)
+    uname = ndb.StringProperty()
+    date = ndb.DateTimeProperty(auto_now_add=True)
 
 
 # ================================
 
-def setEnabled(chat_id, yes):
+def setEnabled(chat_id, yes, uname):
     es = EnableStatus.get_or_insert(str(chat_id))
     es.enabled = yes
+    es.uname = uname
     es.put()
 
 def getEnabled(chat_id):
@@ -157,10 +160,10 @@ class WebhookHandler(webapp2.RequestHandler):
         if text.startswith('/'):
             if text == '/start':
                 reply('Now, send me your current location')
-                setEnabled(chat_id, True)
+                setEnabled(chat_id, True, fr['username'])
             elif text == '/stop':
                 reply('Bot disabled')
-                setEnabled(chat_id, False)
+                setEnabled(chat_id, False, fr['username'])
             elif text == '/help':
                 reply('Hello. I will help you to find places you need.\nTo begin, type /start then send your current location. After that, type any command below to find nearest local places that you need: \n1. /hospital\n2. /school')
             elif text == '/hospital':
